@@ -11,12 +11,15 @@ backend default {
 
 # remove cookies from response
 sub vcl_backend_response {
+  if (beresp.http.Cache-Control) {
+    unset beresp.http.Cache-Control;
+  }
+
   if (beresp.http.Set-Cookie) {
     unset beresp.http.Set-Cookie;
-    unset beresp.http.Cache-Control;
-
-    set beresp.ttl = $CACHE_TTL;
   }
+
+  set beresp.ttl = $CACHE_TTL;
 }
 
 # remove incoming cookies and allow caching POST requests
