@@ -7,6 +7,7 @@ import bodyaccess;
 backend default {
   .host = "$BACKEND_HOST";
   .port = "$BACKEND_PORT";
+  .first_byte_timeout = $BACKEND_FIRST_BYTE_TIMEOUT;
 }
 
 # remove cookies from response
