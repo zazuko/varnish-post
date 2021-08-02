@@ -9,7 +9,7 @@ For POST requests, it will not cache requests with no body or with an empty body
 You can pull the Docker image using:
 
 ```sh
-docker pull docker.io/zazuko/varnish-post
+docker pull ghcr.io/zazuko/varnish-post
 ```
 
 It is listening on the 80 port.
