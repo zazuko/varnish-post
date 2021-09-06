@@ -5,6 +5,8 @@ set -eux
 BACKEND_ENDPOINT="http://localhost:8080"
 CACHED_ENDPOINT="http://localhost:8081"
 
+# Some useful functions
+
 # Display error message and exit
 ## $1: error message to display
 error () {
@@ -22,6 +24,12 @@ info () {
 ## $1: http url
 fetch_time () {
   curl -sL "$1" | jq .time
+}
+
+# Get time field from a JSON response using a POST request
+## $1: http url
+fetch_time_post () {
+  curl -sL -X POST  -H "Content-Type: application/json" "$1" --data '{"foo": "bar"}' | jq .time
 }
 
 # Start of the checks
@@ -65,7 +73,30 @@ info "Check if TTL is working as expected (assuming CACHE_TTL=2s)…"
 sleep 3
 # do a request after TTL to invalidate the cache
 res_tmp=$(fetch_time "${CACHED_ENDPOINT}")
+sleep 1
 res2=$(fetch_time "${CACHED_ENDPOINT}")
+if [ "${res1}" -eq "${res2}" ]; then
+  error "caching ttl is not working"
+fi
+if [ "${res1}" -ge "${res2}" ]; then
+  error "timestamp is not increasing"
+fi
+
+info "Check if it can cache POST request…"
+# invalidate cache if needed
+res_tmp=$(fetch_time_post "${CACHED_ENDPOINT}")
+res1=$(fetch_time_post "${CACHED_ENDPOINT}")
+res2=$(fetch_time_post "${CACHED_ENDPOINT}")
+if [ "${res1}" -ne "${res2}" ]; then
+  error "timestamp is changing => page is not cached"
+fi
+
+info "Check if TTL is working as expected on POST request (assuming CACHE_TTL=2s)…"
+sleep 3
+# do a request after TTL to invalidate the cache
+res_tmp=$(fetch_time_post "${CACHED_ENDPOINT}")
+sleep 1
+res2=$(fetch_time_post "${CACHED_ENDPOINT}")
 if [ "${res1}" -eq "${res2}" ]; then
   error "caching ttl is not working"
 fi
