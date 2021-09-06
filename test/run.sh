@@ -3,6 +3,7 @@
 set -eux
 
 BACKEND_ENDPOINT="http://localhost:8080"
+CACHED_ENDPOINT="http://localhost:8081"
 
 # Display error message and exit
 ## $1: error message to display
@@ -46,6 +47,18 @@ if [ "${res1}" -eq "${res2}" ]; then
 fi
 if [ "${res1}" -ge "${res2}" ]; then
   error "timestamp is not increasing"
+fi
+
+# Start tests on the cached endpoint
+
+info "Check if cached endpoint is up…"
+curl -sL "${CACHED_ENDPOINT}" 2>&1 >/dev/null
+
+info "Check if it can cache basic page…"
+res1=$(fetch_time "${CACHED_ENDPOINT}")
+res2=$(fetch_time "${CACHED_ENDPOINT}")
+if [ "${res1}" -ne "${res2}" ]; then
+  error "timestamp is changing => page is not cached"
 fi
 
 # If we are at this point, no test failed
