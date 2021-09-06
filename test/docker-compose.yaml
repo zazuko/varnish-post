@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  backend:
+    image: ghcr.io/zazuko/varnish-test-backend:latest
+    ports:
+      - 8080:8080
+
+  varnish:
+    image: ghcr.io/zazuko/varnish-post:latest
+    ports:
+      - 8081:80
+    environment:
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=8080
+      - CACHE_TTL=5s
