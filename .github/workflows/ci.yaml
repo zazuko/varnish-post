@@ -60,6 +60,9 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    needs:
+      - docker
+
     services:
       backend:
         image: ghcr.io/zazuko/varnish-test-backend:latest
