@@ -10,13 +10,13 @@ const server = fastify({
 });
 
 // default route
-server.get('/', async () => ({
+server.all('/', async () => ({
   hello: 'world',
   time: Date.now(),
 }));
 
 // say hello to someone
-server.get<{
+server.all<{
   Params: {
     name: string;
   };

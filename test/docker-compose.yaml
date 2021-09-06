@@ -3,11 +3,13 @@ version: "3"
 services:
   backend:
     image: ghcr.io/zazuko/varnish-test-backend:latest
+    build: ./app
     ports:
       - 8080:8080
 
   varnish:
     image: ghcr.io/zazuko/varnish-post:latest
+    build: ../
     ports:
       - 8081:80
     environment:
