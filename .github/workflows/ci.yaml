@@ -56,3 +56,25 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta_test.outputs.tags }}
           labels: ${{ steps.docker_meta_test.outputs.labels }}
+
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      backend:
+        image: ghcr.io/zazuko/varnish-test-backend:latest
+        ports:
+          - 8080:8080
+
+      varnish:
+        image: ghcr.io/zazuko/varnish-post:latest
+        ports:
+          - 8081:80
+        env:
+          BACKEND_HOST: backend
+          BACKEND_PORT: 8080
+          CACHE_TTL: 2s
+
+    steps:
+      - name: Run tests
+        run: cd test && ./run.sh

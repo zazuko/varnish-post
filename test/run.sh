@@ -29,7 +29,7 @@ fetch_time () {
 # Get time field from a JSON response using a POST request
 ## $1: http url
 fetch_time_post () {
-  curl -sL -X POST  -H "Content-Type: application/json" "$1" --data '{"foo": "bar"}' | jq .time
+  curl -sL -X POST -H "Content-Type: application/json" "$1" --data '{"foo": "bar"}' | jq .time
 }
 
 # Start of the checks
