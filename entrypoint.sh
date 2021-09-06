@@ -16,3 +16,6 @@ varnishd \
   -p feature=+http2 \
   -s "malloc,${VARNISH_SIZE}" \
   "$@"
+
+# use following to debug hashes
+#   -p vsl_mask=+Hash \

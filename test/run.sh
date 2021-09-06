@@ -29,7 +29,30 @@ fetch_time () {
 # Get time field from a JSON response using a POST request
 ## $1: http url
 fetch_time_post () {
-  curl -sL -X POST -H "Content-Type: application/json" "$1" --data '{"foo": "bar"}' | jq .time
+  curl -sL \
+    -X POST \
+    -H "Content-Type: application/json" \
+    "$1" \
+    --data '{"foo": "bar"}' | jq .time
+}
+
+# Get time field from a JSON response
+## $1: http url
+## $2: basic token
+fetch_auth_time () {
+  curl -sL -H "Authorization: Basic $2" "$1" | jq .time
+}
+
+# Get time field from a JSON response using a POST request
+## $1: http url
+## $2: basic token
+fetch_auth_time_post () {
+  curl -sL \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Basic $2" \
+    "$1" \
+    --data '{"foo": "bar"}' | jq .time
 }
 
 # Start of the checks
@@ -103,6 +126,64 @@ fi
 if [ "${res1}" -ge "${res2}" ]; then
   error "timestamp is not increasing"
 fi
+
+info "Check if it can cache authenticated page…"
+# invalidate cache if needed
+res_tmp=$(fetch_auth_time "${CACHED_ENDPOINT}" "super-secret-token")
+res1=$(fetch_auth_time "${CACHED_ENDPOINT}" "super-secret-token")
+res2=$(fetch_auth_time "${CACHED_ENDPOINT}" "super-secret-token")
+if [ "${res1}" -ne "${res2}" ]; then
+  error "timestamp is changing => page is not cached"
+fi
+
+info "Check if TTL is working as expected on authenticated page (assuming CACHE_TTL=2s)…"
+sleep 3
+# do a request after TTL to invalidate the cache
+res_tmp=$(fetch_auth_time "${CACHED_ENDPOINT}" "super-secret-token")
+sleep 1
+res2=$(fetch_auth_time "${CACHED_ENDPOINT}" "super-secret-token")
+if [ "${res1}" -eq "${res2}" ]; then
+  error "caching ttl is not working"
+fi
+if [ "${res1}" -ge "${res2}" ]; then
+  error "timestamp is not increasing"
+fi
+
+info "Check if it can cache authenticated POST request…"
+# invalidate cache if needed
+res_tmp=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token")
+res_tmp=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token-2")
+res1=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token")
+res2=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token")
+res3=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token-2")
+if [ "${res1}" -ne "${res2}" ]; then
+  error "timestamp is changing => page is not cached"
+fi
+if [ "${res1}" -eq "${res3}" ]; then
+  error "cache does not consider authorization header"
+fi
+
+info "Check if TTL is working as expected on authenticated POST request (assuming CACHE_TTL=2s)…"
+sleep 3
+# do a request after TTL to invalidate the cache
+res_tmp=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token")
+res_tmp=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token-2")
+sleep 1
+res2=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token")
+res4=$(fetch_auth_time_post "${CACHED_ENDPOINT}" "super-secret-token-2")
+if [ "${res1}" -eq "${res2}" ]; then
+  error "caching ttl is not working"
+fi
+if [ "${res3}" -eq "${res4}" ]; then
+  error "caching ttl is not working"
+fi
+if [ "${res1}" -ge "${res2}" ]; then
+  error "timestamp is not increasing"
+fi
+if [ "${res3}" -ge "${res4}" ]; then
+  error "timestamp is not increasing"
+fi
+
 
 # If we are at this point, no test failed
 

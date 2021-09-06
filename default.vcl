@@ -36,16 +36,27 @@ sub vcl_recv {
     }
     return (hash);
   }
+
+  if (req.method != "GET" && req.method != "HEAD") {
+    return (pass);
+  }
+
+  return (hash);
 }
 
 # https://docs.varnish-software.com/tutorials/caching-post-requests/#step-3-change-the-hashing-function
 sub vcl_hash {
+  hash_data(req.http.Authorization);
+  hash_data(req.url);
+
   # to cache POST and PUT requests
   if (req.http.X-Body-Len) {
     bodyaccess.hash_req_body();
   } else {
     hash_data("");
   }
+
+  return (lookup);
 }
 
 # https://docs.varnish-software.com/tutorials/caching-post-requests/#step-4-make-sure-the-backend-gets-a-post-request
