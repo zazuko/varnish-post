@@ -1,5 +1,5 @@
 {
-  "name": "varnish-test-app",
+  "name": "varnish-test-backend",
   "version": "0.1.0",
   "description": "Application to be used as a backend for varnish tests",
   "main": "dist/index.js",
