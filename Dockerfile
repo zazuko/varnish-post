@@ -6,6 +6,8 @@ ENV CACHE_TTL="3600s"
 ENV BODY_SIZE="2048KB"
 ENV BACKEND_FIRST_BYTE_TIMEOUT="60s"
 ENV VARNISH_SIZE="100M"
+ENV DISABLE_ERROR_CACHING="true"
+ENV DISABLE_ERROR_CACHING_TTL="30s"
 
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
   >> /etc/apk/repositories

@@ -15,6 +15,19 @@ server.all('/', async () => ({
   time: Date.now(),
 }));
 
+// check particular error code
+server.all<{
+  Params: {
+    code: number;
+  };
+}>('/error/:code', async (request, reply) => {
+  reply.code(request.params.code).send({
+    hello: 'error',
+    time: Date.now(),
+    code: request.params.code,
+  });
+});
+
 // say hello to someone
 server.all<{
   Params: {

@@ -184,6 +184,20 @@ if [ "${res3}" -ge "${res4}" ]; then
   error "timestamp is not increasing"
 fi
 
+info "Check if errors are not cached…"
+sleep 3
+# do a request after TTL to invalidate the cache
+res_tmp=$(fetch_time "${CACHED_ENDPOINT}/error/500")
+res1=$(fetch_time "${CACHED_ENDPOINT}/error/500")
+sleep 1
+res2=$(fetch_time "${CACHED_ENDPOINT}/error/500")
+if [ "${res1}" -eq "${res2}" ]; then
+  error "error was cached, which should not be the case"
+fi
+if [ "${res1}" -ge "${res2}" ]; then
+  error "timestamp is not increasing"
+fi
+
 
 # If we are at this point, no test failed
 

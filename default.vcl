@@ -21,6 +21,14 @@ sub vcl_backend_response {
   }
 
   set beresp.ttl = $CACHE_TTL;
+
+  # handle errors
+  if ($DISABLE_ERROR_CACHING && beresp.status >= 400) {
+    # send requests directly to the backend for the next ttl period
+    set beresp.ttl = $DISABLE_ERROR_CACHING_TTL;
+    set beresp.uncacheable = true;
+    return (deliver);
+  }
 }
 
 # remove incoming cookies and allow caching POST requests
