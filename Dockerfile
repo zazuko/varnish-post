@@ -1,4 +1,4 @@
-FROM docker.io/alpine:3.14
+FROM docker.io/alpine:3.15
 
 ENV BACKEND_HOST="localhost"
 ENV BACKEND_PORT="3000"
