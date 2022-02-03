@@ -1,9 +1,11 @@
 #!/bin/sh
 
-set -eux
-
 BACKEND_ENDPOINT="http://localhost:8080"
 CACHED_ENDPOINT="http://localhost:8081"
+
+# build and start the stack
+docker-compose build
+docker-compose up -d
 
 # Some useful functions
 
@@ -11,13 +13,33 @@ CACHED_ENDPOINT="http://localhost:8081"
 ## $1: error message to display
 error () {
   echo "ERROR: $1" >&2
+  docker-compose down
   exit 1
 }
 
 # Display information message
 ## $1: info message to display
 info () {
-  echo "\n\nINFO: $1"
+  echo "INFO: $1"
+}
+
+# Wait that a specific HTTP endpoint is ready
+## $1: HTTP endpoint to test
+wait_http_endpoint() {
+  RETRIES=30
+  while true; do
+    curl -sL "$1" 2>&1 >/dev/null
+    if [ "$?" -eq 0 ]; then
+      break
+    fi
+
+    RETRIES=$((RETRIES-1))
+    if [ "${RETRIES}" -le 0 ]; then
+      error "endpoint $1 is not ready"
+    fi
+
+    sleep 1
+  done
 }
 
 # Get time field from a JSON response
@@ -67,8 +89,8 @@ fi
 
 ## Basic checks on the backend application
 
-info "Check if backend application is up…"
-curl -sL "${BACKEND_ENDPOINT}" 2>&1 >/dev/null
+info "Wait for backend application…"
+wait_http_endpoint "${BACKEND_ENDPOINT}"
 
 info "Check if timestamp is changing…"
 res1=$(fetch_time "${BACKEND_ENDPOINT}")
@@ -82,8 +104,8 @@ fi
 
 # Start tests on the cached endpoint
 
-info "Check if cached endpoint is up…"
-curl -sL "${CACHED_ENDPOINT}" 2>&1 >/dev/null
+info "Wait for cached endpoint…"
+wait_http_endpoint "${CACHED_ENDPOINT}"
 
 info "Check if it can cache basic page…"
 res1=$(fetch_time "${CACHED_ENDPOINT}")
@@ -200,5 +222,6 @@ fi
 
 
 # If we are at this point, no test failed
-
 info "All tests passed :)"
+docker-compose down
+exit 0
