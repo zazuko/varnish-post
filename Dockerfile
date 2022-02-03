@@ -27,4 +27,4 @@ COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 80 8443
-CMD [ "tini", "--", "/entrypoint.sh" ]
+ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
