@@ -21,8 +21,7 @@ RUN apk add --no-cache \
 
 # deploy our custom configuration
 WORKDIR /etc/varnish
-RUN mkdir -p /templates
-COPY config/ /templates/config
+COPY config/ /templates
 COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
