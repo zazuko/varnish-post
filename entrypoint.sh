@@ -1,11 +1,17 @@
 #!/bin/sh
 
-set -eux
+set -eu
 
-# generate configuration file
-envsubst \
-  < /templates/default.vcl \
-  > /etc/varnish/default.vcl
+# environment variables substitution
+for SRC_LOCATION in $(find /templates -type f); do
+  DST_LOCATION=$(echo "${SRC_LOCATION}" | sed 's/^\/templates/\/etc\/varnish/')
+  envsubst \
+    < "${SRC_LOCATION}" \
+    > "${DST_LOCATION}"
+  echo "INFO: generated '${DST_LOCATION}' from '${SRC_LOCATION}' (environment variables substitution)"
+done
+
+set -x
 
 # run varnish
 varnishd \
