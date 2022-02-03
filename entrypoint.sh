@@ -16,7 +16,7 @@ set -x
 # run varnish
 varnishd \
   -F \
-  -f /etc/varnish/default.vcl \
+  -f "/etc/varnish/${CONFIG_FILE}" \
   -a http=:80,HTTP \
   -a proxy=:8443,PROXY \
   -p feature=+http2 \

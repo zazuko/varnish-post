@@ -9,6 +9,7 @@ ENV BACKEND_FIRST_BYTE_TIMEOUT="60s"
 ENV VARNISH_SIZE="100M"
 ENV DISABLE_ERROR_CACHING="true"
 ENV DISABLE_ERROR_CACHING_TTL="30s"
+ENV CONFIG_FILE="default.vcl"
 
 # install some dependencies
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" \

@@ -25,3 +25,4 @@ You can use following environment variables for configuration:
 - `BODY_SIZE`: maximum size for the body ; if it exceeds this value, it will not be cached (default: `2048KB`)
 - `DISABLE_ERROR_CACHING`: disable the caching of errors (default: `true`)
 - `DISABLE_ERROR_CACHING_TTL`: time where requests should be directly sent to the backend after an error occured (default: `30s`)
+- `CONFIG_FILE`: the name of the configuration file to use (default: `default.vcl`)
