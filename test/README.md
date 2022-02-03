@@ -1,18 +1,12 @@
 # Run tests
 
-You can build the docker images locally if you want:
+You will need the following tools on your machine:
 
-```sh
-docker-compose build
-```
+- `docker-compose`
+- `jq`
+- `curl`
 
-Run the stack, by using the following command:
-
-```sh
-docker-compose up
-```
-
-And run the tests using:
+Then run the following command to run the tests:
 
 ```sh
 ./run.sh
