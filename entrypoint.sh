@@ -4,7 +4,7 @@ set -eux
 
 # generate configuration file
 envsubst \
-  < /templates/default.vcl \
+  < /templates/config/default.vcl \
   > /etc/varnish/default.vcl
 
 # run varnish
