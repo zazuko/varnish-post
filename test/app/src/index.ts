@@ -41,7 +41,10 @@ server.all<{
 // start listening on specified host:port
 (async () => {
   try {
-    await server.listen(port, host);
+    await server.listen({
+      port: parseInt(`${port}`, 10),
+      host,
+    });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
