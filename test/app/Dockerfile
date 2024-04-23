@@ -1,24 +1,24 @@
-FROM docker.io/library/node:16-alpine
+FROM docker.io/library/node:20-alpine
 
 WORKDIR /app
 
-# install tini to handle signals
+# Install tini to handle signals
 RUN apk add --no-cache tini
 
-# configure server listening
+# Configure server listening
 ENV SERVER_PORT="8080"
 ENV SERVER_HOST="::"
 
-# build the app
+# Build the app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
 
-# app is exposed on the specified port
+# App is exposed on the specified port
 EXPOSE "${SERVER_PORT}"
 
-# run as "nobody", a non-root user
-USER 65534:65534
+# Run as a non-root user
+USER 1000:1000
 
 CMD [ "tini", "--", "node", "dist/index.js" ]
