@@ -4,8 +4,8 @@ BACKEND_ENDPOINT="http://localhost:8080"
 CACHED_ENDPOINT="http://localhost:8081"
 
 # build and start the stack
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 
 # Some useful functions
 
@@ -13,7 +13,7 @@ docker-compose up -d
 ## $1: error message to display
 error () {
   echo "ERROR: $1" >&2
-  docker-compose down
+  docker compose down
   exit 1
 }
 
@@ -220,8 +220,20 @@ if [ "${res1}" -ge "${res2}" ]; then
   error "timestamp is not increasing"
 fi
 
+info "Check if we can purge a cache entry…"
+sleep 3
+# do a request after TTL to invalidate the cache
+res_tmp=$(fetch_time "${CACHED_ENDPOINT}")
+res1=$(fetch_time "${CACHED_ENDPOINT}")
+sleep 1
+curl -sL -X PURGE "${CACHED_ENDPOINT}" >/dev/null
+res2=$(fetch_time "${CACHED_ENDPOINT}")
+if [ "${res1}" -eq "${res2}" ]; then
+  error "cache was not purged"
+fi
+
 
 # If we are at this point, no test failed
 info "All tests passed :)"
-docker-compose down
+docker compose down
 exit 0
