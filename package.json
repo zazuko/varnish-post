@@ -1,6 +1,6 @@
 {
   "name": "varnish-post",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Custom Docker image for Varnish",
   "main": "index.js",
   "repository": "git@github.com:zazuko/varnish-post.git",
