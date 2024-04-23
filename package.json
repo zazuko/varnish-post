@@ -1,0 +1,16 @@
+{
+  "name": "varnish-post",
+  "version": "1.2.0",
+  "description": "Custom Docker image for Varnish",
+  "main": "index.js",
+  "repository": "git@github.com:zazuko/varnish-post.git",
+  "author": "Zazuko GmbH",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "release": "changeset tag"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1"
+  }
+}
