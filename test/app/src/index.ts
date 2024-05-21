@@ -1,17 +1,20 @@
-import fastify from 'fastify';
+import fastify from "fastify";
+import fastifyFormbody from "@fastify/formbody";
 
 // fetch values from environment variables
 const port = process.env.SERVER_PORT || 8080;
-const host = process.env.SERVER_HOST || '::';
+const host = process.env.SERVER_HOST || "::";
 
 // init fastify
 const server = fastify({
   logger: true,
 });
 
+server.register(fastifyFormbody);
+
 // default route
-server.all('/', async () => ({
-  hello: 'world',
+server.all("/", async () => ({
+  hello: "world",
   time: Date.now(),
 }));
 
@@ -20,9 +23,9 @@ server.all<{
   Params: {
     code: number;
   };
-}>('/error/:code', async (request, reply) => {
+}>("/error/:code", async (request, reply) => {
   reply.code(request.params.code).send({
-    hello: 'error',
+    hello: "error",
     time: Date.now(),
     code: request.params.code,
   });
@@ -33,7 +36,7 @@ server.all<{
   Params: {
     name: string;
   };
-}>('/:name', async (request) => ({
+}>("/:name", async (request) => ({
   hello: request.params.name,
   time: Date.now(),
 }));
