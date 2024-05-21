@@ -26,3 +26,4 @@ You can use following environment variables for configuration:
 - `DISABLE_ERROR_CACHING`: disable the caching of errors (default: `true`)
 - `DISABLE_ERROR_CACHING_TTL`: time where requests should be directly sent to the backend after an error occured (default: `30s`)
 - `CONFIG_FILE`: the name of the configuration file to use (default: `default.vcl`)
+- `ENABLE_LOGS`: enable logs (default: `true`)

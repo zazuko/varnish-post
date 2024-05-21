@@ -10,6 +10,7 @@ ENV VARNISH_SIZE="100M"
 ENV DISABLE_ERROR_CACHING="true"
 ENV DISABLE_ERROR_CACHING_TTL="30s"
 ENV CONFIG_FILE="default.vcl"
+ENV ENABLE_LOGS="true"
 
 # Install some dependencies
 RUN apt-get update \

@@ -224,14 +224,44 @@ info "Check if we can purge a cache entry…"
 sleep 3
 # do a request after TTL to invalidate the cache
 res_tmp=$(fetch_time "${CACHED_ENDPOINT}")
+res_tmp=$(fetch_time "${CACHED_ENDPOINT}/cached")
+res_tmp=$(fetch_time "${CACHED_ENDPOINT}/purged")
 res1=$(fetch_time "${CACHED_ENDPOINT}")
+res1_1=$(fetch_time "${CACHED_ENDPOINT}/cached")
+res1_2=$(fetch_time "${CACHED_ENDPOINT}/purged")
 sleep 1
 curl -sL -X PURGE "${CACHED_ENDPOINT}" >/dev/null
+curl -sL -X PURGE "${CACHED_ENDPOINT}/purged" >/dev/null
 res2=$(fetch_time "${CACHED_ENDPOINT}")
+res2_1=$(fetch_time "${CACHED_ENDPOINT}/cached")
+res2_2=$(fetch_time "${CACHED_ENDPOINT}/purged")
 if [ "${res1}" -eq "${res2}" ]; then
   error "cache was not purged"
 fi
+if [ "${res1_1}" -ne "${res2_1}" ]; then
+  error "cache was purged"
+fi
+if [ "${res1_2}" -eq "${res2_2}" ]; then
+  error "cache was not purged"
+fi
 
+
+info "Check if we can purge a cache entry (POST scenario)…"
+# We cache a POST request
+req1=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/test-cache-purge | jq .time)
+# We cache another POST request
+req2=$(curl -sL -X POST --data '{"foo": "foobar"}' http://localhost:8081/test-cache-purge | jq .time)
+# We request the first POST request to be purged
+curl -sL -X PURGE --data '{"foo": "bar"}' http://localhost:8081/test-cache-purge >/dev/null
+# We check the requests
+req3=$(curl -sL -X POST --data '{"foo": "foo"}' http://localhost:8081/test-cache-purge | jq .time)
+req4=$(curl -sL -X POST --data '{"foo": "foobar"}' http://localhost:8081/test-cache-purge | jq .time)
+if [ "${req1}" -eq "${req3}" ]; then
+  error "cache was not purged"
+fi
+if [ "${req2}" -ne "${req4}" ]; then
+  error "cache was purged"
+fi
 
 # If we are at this point, no test failed
 info "All tests passed :)"

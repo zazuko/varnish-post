@@ -78,6 +78,8 @@ sub vcl_backend_fetch {
   if (bereq.http.X-Body-Len) {
     set bereq.method = "POST";
   }
+
+  return (fetch);
 }
 
 # Indicate whether the response was served from cache or not
@@ -88,4 +90,6 @@ sub vcl_deliver {
   } else {
     set resp.http.X-Cache = "MISS";
   }
+
+  return (deliver);
 }
