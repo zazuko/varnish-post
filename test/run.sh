@@ -225,10 +225,21 @@ sleep 3
 # do a request after TTL to invalidate the cache
 res_tmp=$(fetch_time "${CACHED_ENDPOINT}")
 res1=$(fetch_time "${CACHED_ENDPOINT}")
+res1_1=$(fetch_time "${CACHED_ENDPOINT}/cached")
+res1_2=$(fetch_time "${CACHED_ENDPOINT}/purged")
 sleep 1
 curl -sL -X PURGE "${CACHED_ENDPOINT}" >/dev/null
+curl -sL -X PURGE "${CACHED_ENDPOINT}/purged" >/dev/null
 res2=$(fetch_time "${CACHED_ENDPOINT}")
+res2_1=$(fetch_time "${CACHED_ENDPOINT}/cached")
+res2_2=$(fetch_time "${CACHED_ENDPOINT}/purged")
 if [ "${res1}" -eq "${res2}" ]; then
+  error "cache was not purged"
+fi
+if [ "${res1_1}" -ne "${res2_1}" ]; then
+  error "cache was purged"
+fi
+if [ "${res1_2}" -eq "${res2_2}" ]; then
   error "cache was not purged"
 fi
 
