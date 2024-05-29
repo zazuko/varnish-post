@@ -27,3 +27,9 @@ You can use following environment variables for configuration:
 - `DISABLE_ERROR_CACHING_TTL`: time where requests should be directly sent to the backend after an error occured (default: `30s`)
 - `CONFIG_FILE`: the name of the configuration file to use (default: `default.vcl`)
 - `ENABLE_LOGS`: enable logs (default: `true`)
+
+## Cache invalidation
+
+You can invalidate the cache entry by sending the same request with the `PURGE` method.
+
+If your backend is sending a `xkey` header, if you send a `PURGE` request with the same `xkey` header, it will invalidate all cache entries with the same tag.
