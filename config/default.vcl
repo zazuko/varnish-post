@@ -2,6 +2,7 @@ vcl 4.1;
 
 import std;
 import bodyaccess;
+import xkey;
 
 # Backend server that should be cached
 backend default {
@@ -37,7 +38,12 @@ sub vcl_recv {
 
   # Handle PURGE requests
   if (req.method == "PURGE") {
-    return (purge);
+    if (req.http.xkey) {
+      set req.http.n-gone = xkey.purge(req.http.xkey);
+      return (synth(200, "Invalidated " + req.http.n-gone + " objects"));
+    } else {
+      return (purge);
+    }
   }
 
   # Caching POST requests by caching the request body

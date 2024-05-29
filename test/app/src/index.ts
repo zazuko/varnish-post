@@ -1,24 +1,24 @@
 import fastify from "fastify";
 import fastifyFormbody from "@fastify/formbody";
 
-// fetch values from environment variables
+// Fetch values from environment variables
 const port = process.env.SERVER_PORT || 8080;
 const host = process.env.SERVER_HOST || "::";
 
-// init fastify
+// Init Fastify
 const server = fastify({
   logger: true,
 });
 
 server.register(fastifyFormbody);
 
-// default route
+// Default route
 server.all("/", async () => ({
   hello: "world",
   time: Date.now(),
 }));
 
-// check particular error code
+// Check particular error code
 server.all<{
   Params: {
     code: number;
@@ -31,7 +31,20 @@ server.all<{
   });
 });
 
-// say hello to someone
+// Return a specific xkey header
+server.all<{
+  Params: {
+    headerValue: string;
+  };
+}>("/x-header/:headerValue", async (request, reply) => {
+  return reply.header("xkey", request.params.headerValue).send({
+    hello: "xkey header",
+    time: Date.now(),
+    value: request.params.headerValue,
+  });
+});
+
+// Say hello to someone
 server.all<{
   Params: {
     name: string;
@@ -41,7 +54,7 @@ server.all<{
   time: Date.now(),
 }));
 
-// start listening on specified host:port
+// Start listening on specified host:port
 (async () => {
   try {
     await server.listen({

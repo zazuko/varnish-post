@@ -263,6 +263,60 @@ if [ "${req2}" -ne "${req4}" ]; then
   error "cache was purged"
 fi
 
+info "Check with xkey…"
+# We cache a POST request (without xkey)
+req0_1=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header-test | jq .time)
+# We cache a POST request
+req1=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/test | jq .time)
+# We cache another POST request
+req2=$(curl -sL -X POST --data '{"foo": "foobar"}' http://localhost:8081/x-header/test | jq .time)
+# Results should be different, because the payload is different
+if [ "${req1}" -eq "${req2}" ]; then
+  error "should not be the same"
+fi
+if [ "${req1}" -eq "${req0_1}" ]; then
+  error "should not be the same"
+fi
+# Let's try to query the same endpoints with the same payload
+req0_2=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header-test | jq .time)
+req3=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/test | jq .time)
+req4=$(curl -sL -X POST --data '{"foo": "foobar"}' http://localhost:8081/x-header/test | jq .time)
+req5=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/test2 | jq .time)
+# Results should be cached
+if [ "${req1}" -ne "${req3}" ]; then
+  error "should be the same"
+fi
+if [ "${req2}" -ne "${req4}" ]; then
+  error "should be the same"
+fi
+if [ "${req0_1}" -ne "${req0_2}" ]; then
+  error "should be the same"
+fi
+if [ "${req3}" -eq "${req5}" ]; then
+  error "should not be the same"
+fi
+# Let's try to purge the cache
+curl -sL -X PURGE -H 'xkey: test' http://localhost:8081/x-header/anything >/dev/null
+req0_3=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header-test | jq .time)
+req6=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/test | jq .time)
+req7=$(curl -sL -X POST --data '{"foo": "foobar"}' http://localhost:8081/x-header/test | jq .time)
+req8=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/test2 | jq .time)
+if [ "${req6}" -eq "${req7}" ]; then
+  error "should not be the same"
+fi
+if [ "${req3}" -eq "${req6}" ]; then
+  error "should not be the same"
+fi
+if [ "${req4}" -eq "${req7}" ]; then
+  error "should not be the same"
+fi
+if [ "${req0_2}" -ne "${req0_3}" ]; then
+  error "should be the same"
+fi
+if [ "${req5}" -ne "${req8}" ]; then
+  error "should be the same"
+fi
+
 # If we are at this point, no test failed
 info "All tests passed :)"
 docker compose down
