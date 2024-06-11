@@ -25,7 +25,9 @@ const cleanupHeaderValue = (
   if (newValue.length > 256) {
     return defaultValue;
   }
-  return newValue;
+
+  // Support URL encoded values
+  return decodeURIComponent(newValue);
 };
 
 // Fetch values from environment variables

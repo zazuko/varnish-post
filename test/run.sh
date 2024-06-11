@@ -317,6 +317,28 @@ if [ "${req5}" -ne "${req8}" ]; then
   error "should be the same"
 fi
 
+# Just try with xkey with slashes
+req1=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http://example.com/custom/path | jq .time)
+req2=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http://example.com/custom/path | jq .time)
+req3=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http%3A%2F%2Fexample.com%2Fcustom%2Fpath | jq .time)
+req4=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http%3A%2F%2Fexample.com%2Fcustom%2Fpath | jq .time)
+if [ "${req1}" -ne "${req2}" ]; then
+  error "should be the same - url with slashes"
+fi
+if [ "${req3}" -ne "${req4}" ]; then
+  error "should be the same - encoded url with slashes"
+fi
+# Clear cache
+curl -sL -X PURGE -H 'xkey: http://example.com/custom/path' http://localhost:8081/ >/dev/null
+req5=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http://example.com/custom/path | jq .time)
+req6=$(curl -sL -X POST --data '{"foo": "bar"}' http://localhost:8081/x-header/http%3A%2F%2Fexample.com%2Fcustom%2Fpath | jq .time)
+if [ "${req1}" -eq "${req5}" ]; then
+  error "should not be the same - url with slashes"
+fi
+if [ "${req3}" -eq "${req6}" ]; then
+  error "should not be the same - encoded url with slashes"
+fi
+
 # If we are at this point, no test failed
 info "All tests passed :)"
 docker compose down
