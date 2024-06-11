@@ -1,6 +1,33 @@
 import fastify from "fastify";
 import fastifyFormbody from "@fastify/formbody";
 
+/**
+ * Cleanup header value.
+ * Returns default value if the header value is not a string or is empty or too long (more than 256 characters long).
+ *
+ * @param headerValue Value of the header
+ * @param defaultValue Default value of the header
+ * @returns Cleaned up header value
+ */
+const cleanupHeaderValue = (
+  headerValue: string,
+  defaultValue: string
+): string => {
+  if (typeof headerValue !== "string") {
+    return defaultValue;
+  }
+
+  // Split, remove all lines except the first one (can be CRLF, LF or CR), trim, and return
+  const newValue = headerValue.split(/\r\n|\r|\n/)[0].trim();
+  if (newValue.length === 0) {
+    return defaultValue;
+  }
+  if (newValue.length > 256) {
+    return defaultValue;
+  }
+  return newValue;
+};
+
 // Fetch values from environment variables
 const port = process.env.SERVER_PORT || 8080;
 const host = process.env.SERVER_HOST || "::";
@@ -32,15 +59,15 @@ server.all<{
 });
 
 // Return a specific xkey header
-server.all<{
-  Params: {
-    headerValue: string;
-  };
-}>("/x-header/:headerValue", async (request, reply) => {
-  return reply.header("xkey", request.params.headerValue).send({
+server.all("/x-header/*", async (request, reply) => {
+  const path =
+    request.raw.url?.split("?")[0].split("/").slice(2).join("/") || "";
+  const xkeyValue = cleanupHeaderValue(path, "default");
+
+  return reply.header("xkey", xkeyValue).send({
     hello: "xkey header",
     time: Date.now(),
-    value: request.params.headerValue,
+    value: xkeyValue,
   });
 });
 
