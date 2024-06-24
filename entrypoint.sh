@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ENABLE_LOGS="${ENABLE_LOGS}"
+ENABLE_PROMETHEUS_EXPORTER="${ENABLE_PROMETHEUS_EXPORTER}"
 
 set -eu
 
@@ -16,6 +17,13 @@ done
 # Display logs if configured
 if [ "${ENABLE_LOGS}" = "true" ]; then
   varnishncsa&
+fi
+
+# Start prometheus_varnish_exporter if enabled
+if [ "${ENABLE_PROMETHEUS_EXPORTER}" = "true" ]; then
+  (sleep 2 && prometheus_varnish_exporter \
+    -web.listen-address ":9131" \
+    -web.telemetry-path "/metrics") &
 fi
 
 set -x
