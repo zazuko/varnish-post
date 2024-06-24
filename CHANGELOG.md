@@ -1,5 +1,11 @@
 # varnish-post
 
+## 2.4.0
+
+### Minor Changes
+
+- 3db843d: Enable Prometheus Exporter by setting `ENABLE_PROMETHEUS_EXPORTER` to `true`.
+
 ## 2.3.0
 
 ### Minor Changes
