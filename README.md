@@ -30,6 +30,7 @@ You can use following environment variables for configuration:
 - `ENABLE_LOGS`: enable logs (default: `true`)
 - `ENABLE_PROMETHEUS_EXPORTER`: enable the Prometheus exporter if set to `true` (default: `false`).
   If enabled, the exporter will be available on the 9131 port.
+- `PURGE_ACL_CUSTOM`: custom ACL for the PURGE method (default: `localhost`) ; you can use `"0.0.0.0"/0` to allow all.
 
 ## Cache invalidation
 

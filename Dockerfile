@@ -25,6 +25,7 @@ ENV DISABLE_ERROR_CACHING_TTL="30s"
 ENV CONFIG_FILE="default.vcl"
 ENV ENABLE_LOGS="true"
 ENV ENABLE_PROMETHEUS_EXPORTER="false"
+ENV PURGE_ACL="localhost"
 
 # Install some dependencies
 RUN apt-get update \
