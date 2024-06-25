@@ -20,6 +20,7 @@ You can use following environment variables for configuration:
 
 - `BACKEND_HOST`: host of the backend to cache (default: `localhost`)
 - `BACKEND_PORT`: port of the backend to cache (default: `3000`)
+- `VARNISH_SIZE`: size of the cache in the RAM (default: `100M`)
 - `BACKEND_FIRST_BYTE_TIMEOUT`: first byte timeout (default: `60s`)
 - `CACHE_TTL`: time to cache the request (default: `3600s`)
 - `BODY_SIZE`: maximum size for the body ; if it exceeds this value, it will not be cached (default: `2048KB`)
@@ -29,9 +30,15 @@ You can use following environment variables for configuration:
 - `ENABLE_LOGS`: enable logs (default: `true`)
 - `ENABLE_PROMETHEUS_EXPORTER`: enable the Prometheus exporter if set to `true` (default: `false`).
   If enabled, the exporter will be available on the 9131 port.
+- `PURGE_ACL`: custom ACL for the PURGE method (default: `localhost`) ; you can use `0.0.0.0/0` to allow all.
 
 ## Cache invalidation
 
 You can invalidate the cache entry by sending the same request with the `PURGE` method.
 
 If your backend is sending a `xkey` header, if you send a `PURGE` request with the same `xkey` header, it will invalidate all cache entries with the same tag.
+
+## License
+
+This project is licensed under the MIT License.
+See the [LICENSE](./LICENSE) file for details.

@@ -4,6 +4,10 @@ import std;
 import bodyaccess;
 import xkey;
 
+acl purge {
+  $PURGE_ACL;
+}
+
 # Backend server that should be cached
 backend default {
   .host = "$BACKEND_HOST";
@@ -38,6 +42,9 @@ sub vcl_recv {
 
   # Handle PURGE requests
   if (req.method == "PURGE") {
+    if (!client.ip ~ purge) {
+      return (synth(405, "Method Not Allowed"));
+    }
     if (req.http.xkey) {
       set req.http.n-gone = xkey.purge(req.http.xkey);
       return (synth(200, "Invalidated " + req.http.n-gone + " objects"));

@@ -5,6 +5,22 @@ ENABLE_PROMETHEUS_EXPORTER="${ENABLE_PROMETHEUS_EXPORTER}"
 
 set -eu
 
+# Function to transform a host into a VCL-friendly format
+transform_host() {
+  input="$1"
+
+  # Check if input is in CIDR notation (e.g., 0.0.0.0/0)
+  if echo "$input" | grep -q "/"; then
+    ip_part=$(echo "$input" | cut -d'/' -f1)
+    cidr_part=$(echo "$input" | cut -d'/' -f2)
+    echo "\"$ip_part\"/$cidr_part"
+  else
+    # Otherwise, it's a regular hostname or IP
+    echo "\"$input\""
+  fi
+}
+PURGE_ACL=$(transform_host "${PURGE_ACL}")
+
 # Environment variables substitution
 for SRC_LOCATION in $(find /templates -type f); do
   DST_LOCATION=$(echo "${SRC_LOCATION}" | sed 's/^\/templates/\/etc\/varnish/')
@@ -25,6 +41,9 @@ if [ "${ENABLE_PROMETHEUS_EXPORTER}" = "true" ]; then
     -web.listen-address ":9131" \
     -web.telemetry-path "/metrics") &
 fi
+
+# Display Varnish configuration
+cat "/etc/varnish/${CONFIG_FILE}"
 
 set -x
 
