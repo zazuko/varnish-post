@@ -36,3 +36,8 @@ You can use following environment variables for configuration:
 You can invalidate the cache entry by sending the same request with the `PURGE` method.
 
 If your backend is sending a `xkey` header, if you send a `PURGE` request with the same `xkey` header, it will invalidate all cache entries with the same tag.
+
+## License
+
+This project is licensed under the MIT License.
+See the [LICENSE](./LICENSE) file for details.
