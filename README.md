@@ -20,6 +20,7 @@ You can use following environment variables for configuration:
 
 - `BACKEND_HOST`: host of the backend to cache (default: `localhost`)
 - `BACKEND_PORT`: port of the backend to cache (default: `3000`)
+- `VARNISH_SIZE`: size of the cache in the RAM (default: `100M`)
 - `BACKEND_FIRST_BYTE_TIMEOUT`: first byte timeout (default: `60s`)
 - `CACHE_TTL`: time to cache the request (default: `3600s`)
 - `BODY_SIZE`: maximum size for the body ; if it exceeds this value, it will not be cached (default: `2048KB`)
