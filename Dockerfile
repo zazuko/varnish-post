@@ -11,7 +11,7 @@ RUN git clone https://github.com/jonnenauha/prometheus_varnish_exporter.git . \
   && go build -o prometheus_varnish_exporter
 
 # Build the final image
-FROM docker.io/library/ubuntu:22.04
+FROM docker.io/library/ubuntu:24.04
 
 # Configuration
 ENV BACKEND_HOST="localhost"
