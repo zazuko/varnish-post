@@ -1,5 +1,11 @@
 # varnish-post
 
+## 2.6.0
+
+### Minor Changes
+
+- d5f1065: Upgrade Ubuntu to 24.04 for the base image
+
 ## 2.5.0
 
 ### Minor Changes
