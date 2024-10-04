@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "Application to be used as a backend for varnish tests",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc -p .",
-    "dev": "ts-node-dev --respawn -- src/index.ts",
     "start": "npm run build && node ./dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,17 +21,16 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.7.4",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "^8.17.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-plugin-import": "^2.30.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.2"
+    "eslint": "^9.11.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.0"
   },
   "dependencies": {
-    "@fastify/formbody": "^7.4.0",
-    "fastify": "^4.28.1"
+    "@fastify/formbody": "^8.0.1",
+    "fastify": "^5.0.0"
   }
 }
