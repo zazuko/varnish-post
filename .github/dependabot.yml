@@ -18,3 +18,18 @@ updates:
     directory: "/test/app"
     schedule:
       interval: "weekly"
+    groups:
+      eslint:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "@types/eslint__*"
+          - "typescript-eslint"
+      typescript:
+        patterns:
+          - "typescript"
+          - "ts-node"
+      fastify:
+        patterns:
+          - "fastify"
+          - "@fastify/*"
