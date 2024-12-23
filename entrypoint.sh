@@ -2,6 +2,7 @@
 
 ENABLE_LOGS="${ENABLE_LOGS}"
 ENABLE_PROMETHEUS_EXPORTER="${ENABLE_PROMETHEUS_EXPORTER}"
+CUSTOM_ARGS="${CUSTOM_ARGS}"
 
 set -eu
 
@@ -55,4 +56,5 @@ varnishd \
   -a proxy=:8443,PROXY \
   -p feature=+http2 \
   -s "malloc,${VARNISH_SIZE}" \
+  ${CUSTOM_ARGS} \
   "$@"
