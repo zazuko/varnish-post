@@ -1,11 +1,12 @@
 # Build the prometheus_varnish_exporter binary
-FROM docker.io/library/golang:1.22 as prometheus_varnish_exporter
+FROM docker.io/library/golang:1.23 AS prometheus_varnish_exporter
 WORKDIR /app
 
 # Releases: https://github.com/jonnenauha/prometheus_varnish_exporter/releases
 ARG PROMETHEUS_VARNISH_EXPORTER_VERSION=1.6.1
 
-RUN git clone https://github.com/jonnenauha/prometheus_varnish_exporter.git . \
+RUN git config --global advice.detachedHead false \
+  && git clone https://github.com/jonnenauha/prometheus_varnish_exporter.git . \
   && git checkout "${PROMETHEUS_VARNISH_EXPORTER_VERSION}" \
   && go mod download \
   && go build -o prometheus_varnish_exporter
