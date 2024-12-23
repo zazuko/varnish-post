@@ -26,6 +26,7 @@ ENV CONFIG_FILE="default.vcl"
 ENV ENABLE_LOGS="true"
 ENV ENABLE_PROMETHEUS_EXPORTER="false"
 ENV PURGE_ACL="localhost"
+ENV CUSTOM_ARGS=""
 
 # Install some dependencies
 RUN apt-get update \
