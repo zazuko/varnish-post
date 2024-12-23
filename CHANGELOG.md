@@ -1,5 +1,11 @@
 # varnish-post
 
+## 2.7.0
+
+### Minor Changes
+
+- 513b918: Add support for `CUSTOM_ARGS`
+
 ## 2.6.0
 
 ### Minor Changes
