@@ -1,5 +1,11 @@
 # varnish-post
 
+## 2.8.0
+
+### Minor Changes
+
+- ce9e42c: Also hash the Accept header
+
 ## 2.7.0
 
 ### Minor Changes
