@@ -74,6 +74,7 @@ sub vcl_recv {
 # See: https://docs.varnish-software.com/tutorials/caching-post-requests/#step-3-change-the-hashing-function
 sub vcl_hash {
   hash_data(req.http.Authorization);
+  hash_data(req.http.Accept);
   hash_data(req.url);
 
   if (req.http.X-Body-Len) {
