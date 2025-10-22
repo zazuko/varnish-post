@@ -31,6 +31,7 @@ ENV CUSTOM_ARGS=""
 
 # Install some dependencies
 RUN apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y \
   gettext \
   tini \
