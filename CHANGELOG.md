@@ -1,5 +1,11 @@
 # varnish-post
 
+## 2.8.1
+
+### Patch Changes
+
+- 5924c4c: Upgrade various dependencies
+
 ## 2.8.0
 
 ### Minor Changes
