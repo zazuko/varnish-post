@@ -22,7 +22,7 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
