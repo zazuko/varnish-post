@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "@fastify/formbody": "^8.0.2",
-    "fastify": "^5.7.2"
+    "fastify": "^5.7.3"
   }
 }
