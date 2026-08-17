@@ -13,7 +13,13 @@ updates:
     schedule:
       interval: "weekly"
 
-  # Maintain dependencies for npm (test directory)
+  # Maintain dependencies for npm (integration tests)
+  - package-ecosystem: "npm"
+    directory: "/test"
+    schedule:
+      interval: "weekly"
+
+  # Maintain dependencies for npm (test backend application)
   - package-ecosystem: "npm"
     directory: "/test/app"
     schedule:

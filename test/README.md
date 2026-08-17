@@ -1,9 +1,9 @@
 # Run tests
 
-Integration tests for the Varnish image, written with the [Node.js test
-runner](https://nodejs.org/api/test.html). They exercise a real stack: the
-`varnish` service from this repository sitting in front of the small Fastify
-backend in [`app/`](./app).
+Integration tests for the Varnish image, written in TypeScript with the
+[Node.js test runner](https://nodejs.org/api/test.html). They exercise a real
+stack: the `varnish` service from this repository sitting in front of the small
+Fastify backend in [`app/`](./app).
 
 You will need the following tools on your machine:
 
@@ -13,14 +13,27 @@ You will need the following tools on your machine:
 Then run:
 
 ```sh
+npm ci
 npm test
 ```
 
-There is nothing to install first: the tests only use Node built-ins.
+Node runs the `.ts` files directly by stripping their types, so there is no
+build step and no test-runner dependency. TypeScript itself is only used to
+check the types, which is a separate command:
+
+```sh
+npm run typecheck
+```
+
+Because the types are erased rather than compiled, only syntax Node can strip is
+allowed -- no enums, namespaces or parameter properties. `erasableSyntaxOnly` in
+[`tsconfig.json`](./tsconfig.json) enforces that, so the type checker rejects
+anything that would fail at runtime. Relative imports use the `.ts` extension,
+which is what Node resolves.
 
 ## How it works
 
-[`global-setup.js`](./global-setup.js) builds and starts the Compose stack once,
+[`global-setup.ts`](./global-setup.ts) builds and starts the Compose stack once,
 waits for both services to answer, and tears everything down when the run
 finishes. It publishes the container ports on **dynamically allocated host
 ports** and hands their URLs to the tests through `BACKEND_URL` and
@@ -35,12 +48,12 @@ and a changed value means it was fetched from the backend again.
 
 | Path                             | What it covers                                     |
 | -------------------------------- | -------------------------------------------------- |
-| `tests/backend.test.js`          | the test backend itself                            |
-| `tests/caching.test.js`          | GET/POST caching, TTL expiry, `Authorization` split |
-| `tests/errors.test.js`           | error responses are passed through and not cached  |
-| `tests/purge.test.js`            | `PURGE` invalidation                               |
-| `tests/xkey.test.js`             | `xkey` tag-based invalidation                      |
-| `helpers/varnish.js`             | request/assertion helpers shared by the tests      |
+| `tests/backend.test.ts`          | the test backend itself                            |
+| `tests/caching.test.ts`          | GET/POST caching, TTL expiry, `Authorization` split |
+| `tests/errors.test.ts`           | error responses are passed through and not cached  |
+| `tests/purge.test.ts`            | `PURGE` invalidation                               |
+| `tests/xkey.test.ts`             | `xkey` tag-based invalidation                      |
+| `helpers/varnish.ts`             | request/assertion helpers shared by the tests      |
 
 Each test allocates its own URL via `uniquePath()`, so cases stay independent
 even though the files run in parallel against one shared Varnish instance.

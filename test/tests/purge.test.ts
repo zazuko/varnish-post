@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { fetchTime, purge, request, uniquePath } from "../helpers/varnish.js";
+import { fetchTime, purge, request, uniquePath } from "../helpers/varnish.ts";
 
 const AUTH = { Authorization: "Basic super-secret-token" };
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-const requiredEnv = (name) => {
+const requiredEnv = (name: string): string => {
   const value = process.env[name];
 
   if (!value) {
@@ -18,7 +18,8 @@ export const VARNISH_URL = requiredEnv("VARNISH_URL");
 /** Matches CACHE_TTL in compose.yaml. */
 export const CACHE_TTL_MS = 2000;
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 let requestCounter = 0;
 
@@ -28,10 +29,25 @@ let requestCounter = 0;
  * Test files run in parallel against one shared Varnish instance, so each case
  * needs its own cache entry to stay independent.
  */
-export const uniquePath = (prefix = "case") => {
+export const uniquePath = (prefix = "case"): string => {
   requestCounter += 1;
   return `/${prefix}-${process.pid}-${requestCounter}`;
 };
+
+export interface RequestOptions {
+  method?: string;
+  /** Sent as a JSON body, with the matching Content-Type. */
+  json?: unknown;
+  headers?: Record<string, string>;
+  /** Defaults to Varnish; pass BACKEND_URL to bypass the cache. */
+  target?: string;
+}
+
+export interface HttpResponse {
+  status: number;
+  headers: Headers;
+  text: string;
+}
 
 /**
  * Send a request to Varnish.
@@ -39,13 +55,17 @@ export const uniquePath = (prefix = "case") => {
  * The path is concatenated rather than resolved through `new URL()` so that
  * exotic paths (encoded characters, embedded URLs) reach Varnish untouched.
  */
-export const request = async (path, { method = "GET", json, headers = {}, target } = {}) => {
+export const request = async (
+  path: string,
+  { method = "GET", json, headers = {}, target }: RequestOptions = {},
+): Promise<HttpResponse> => {
   const base = target ?? VARNISH_URL;
-  const init = { method, headers: { ...headers } };
+  const requestHeaders: Record<string, string> = { ...headers };
+  const init: RequestInit = { method, headers: requestHeaders };
 
   if (json !== undefined) {
     init.body = JSON.stringify(json);
-    init.headers["Content-Type"] = "application/json";
+    requestHeaders["Content-Type"] = "application/json";
   }
 
   const response = await fetch(`${base}${path}`, init);
@@ -60,29 +80,31 @@ export const request = async (path, { method = "GET", json, headers = {}, target
  * means the response was served from cache and a changed value means it was
  * fetched again.
  */
-export const fetchTime = async (path, options = {}) => {
+export const fetchTime = async (path: string, options: RequestOptions = {}): Promise<number> => {
   const { status, text } = await request(path, options);
+  const method = options.method ?? "GET";
 
-  let payload;
+  let payload: { time?: unknown };
   try {
-    payload = JSON.parse(text);
+    payload = JSON.parse(text) as { time?: unknown };
   } catch {
     throw new Error(
-      `Expected JSON from ${options.method ?? "GET"} ${path} (HTTP ${status}) but got: ${text.slice(0, 200)}`,
+      `Expected JSON from ${method} ${path} (HTTP ${status}) but got: ${text.slice(0, 200)}`,
     );
   }
 
-  assert.equal(
-    typeof payload.time,
-    "number",
-    `Expected a numeric "time" from ${options.method ?? "GET"} ${path} (HTTP ${status}), got ${JSON.stringify(payload.time)}`,
+  assert.ok(
+    typeof payload.time === "number",
+    `Expected a numeric "time" from ${method} ${path} (HTTP ${status}), got ${JSON.stringify(payload.time)}`,
   );
 
   return payload.time;
 };
 
-export const purge = (path, { headers = {}, json } = {}) =>
-  request(path, { method: "PURGE", headers, json });
+export const purge = (
+  path: string,
+  { headers = {}, json }: Pick<RequestOptions, "headers" | "json"> = {},
+): Promise<HttpResponse> => request(path, { method: "PURGE", headers, json });
 
 /**
  * Let a cache entry expire, then return the refreshed timestamp.
@@ -96,7 +118,12 @@ export const purge = (path, { headers = {}, json } = {}) =>
  * bounded on purpose: an entry still being served stale beyond it is a failure,
  * not something to keep polling through.
  */
-export const refreshAfterTtl = async (staleTime, path, options = {}, { graceMs = 1000 } = {}) => {
+export const refreshAfterTtl = async (
+  staleTime: number,
+  path: string,
+  options: RequestOptions = {},
+  { graceMs = 1000 }: { graceMs?: number } = {},
+): Promise<number> => {
   await sleep(CACHE_TTL_MS + 500);
 
   // Serves the stale object and kicks off the background revalidation.

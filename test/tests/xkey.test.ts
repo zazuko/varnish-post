@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { fetchTime, purge, request, uniquePath } from "../helpers/varnish.js";
+import { fetchTime, purge, request, uniquePath } from "../helpers/varnish.ts";
 
 /** The backend echoes everything after `/x-header/` back as the `xkey` header. */
-const tagged = (tag) => `/x-header/${tag}`;
+const tagged = (tag: string): string => `/x-header/${tag}`;
 
 const body = { method: "POST", json: { foo: "bar" } };
 

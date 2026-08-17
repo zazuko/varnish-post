@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { fetchTime, request, uniquePath } from "../helpers/varnish.js";
+import { fetchTime, request, uniquePath } from "../helpers/varnish.ts";
 
 /**
  * The backend exposes errors as `/error/:code`, so uniqueness has to ride in
  * the query string -- an extra path segment would not match the route. Varnish
  * hashes the full URL, so this still yields a private cache entry per test.
  */
-const errorPath = (code) => `/error/${code}?case=${uniquePath("err").slice(1)}`;
+const errorPath = (code: number): string => `/error/${code}?case=${uniquePath("err").slice(1)}`;
 
 describe("error responses", () => {
   it("passes the backend status through", async () => {

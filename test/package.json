@@ -6,6 +6,11 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "test": "node --test --test-global-setup=./global-setup.js \"tests/*.test.js\""
+    "test": "node --test --test-global-setup=./global-setup.ts \"tests/*.test.ts\"",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
   }
 }

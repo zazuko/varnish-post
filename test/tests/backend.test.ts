@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { BACKEND_URL, fetchTime, uniquePath } from "../helpers/varnish.js";
+import { BACKEND_URL, fetchTime, uniquePath } from "../helpers/varnish.ts";
 
 describe("test backend", () => {
   it("stamps every response with an increasing timestamp", async () => {
