@@ -19,16 +19,15 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      eslint:
+      oxc:
         patterns:
-          - "eslint"
-          - "@eslint/*"
-          - "@types/eslint__*"
-          - "typescript-eslint"
+          - "oxlint"
+          - "oxfmt"
+          - "@oxlint/*"
+          - "@oxfmt/*"
       typescript:
         patterns:
           - "typescript"
-          - "ts-node"
       fastify:
         patterns:
           - "fastify"

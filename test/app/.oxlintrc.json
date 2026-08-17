@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "oxc/no-async-endpoint-handlers": "off"
+  },
+  "env": {
+    "builtin": true,
+    "es2022": true,
+    "node": true
+  },
+  "ignorePatterns": ["dist"]
+}
