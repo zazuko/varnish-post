@@ -1,13 +1,15 @@
 services:
   backend:
     build: ./app
+    # Host port is assigned dynamically to avoid clashing with anything else
+    # already listening locally. Tests discover it via `docker compose port`.
     ports:
-      - 8080:8080
+      - 8080
 
   varnish:
     build: ../
     ports:
-      - 8081:80
+      - 80
     environment:
       - BACKEND_HOST=backend
       - BACKEND_PORT=8080
