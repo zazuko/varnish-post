@@ -7,6 +7,9 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "npm run build && node ./dist/index.js",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -21,12 +24,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@types/node": "^26.2.0",
-    "eslint": "^10.8.1",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.67.0"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "@fastify/formbody": "^9.0.0",

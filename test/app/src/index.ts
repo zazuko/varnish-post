@@ -9,10 +9,7 @@ import fastifyFormbody from "@fastify/formbody";
  * @param defaultValue Default value of the header
  * @returns Cleaned up header value
  */
-const cleanupHeaderValue = (
-  headerValue: string,
-  defaultValue: string
-): string => {
+const cleanupHeaderValue = (headerValue: string, defaultValue: string): string => {
   if (typeof headerValue !== "string") {
     return defaultValue;
   }
@@ -62,8 +59,7 @@ server.all<{
 
 // Return a specific xkey header
 server.all("/x-header/*", async (request, reply) => {
-  const path =
-    request.raw.url?.split("?")[0].split("/").slice(2).join("/") || "";
+  const path = request.raw.url?.split("?")[0].split("/").slice(2).join("/") || "";
   const xkeyValue = cleanupHeaderValue(path, "default");
 
   return reply.header("xkey", xkeyValue).send({
