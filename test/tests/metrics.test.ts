@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { fetchTime, METRICS_URL, uniquePath } from "../helpers/varnish.ts";
+import { fetchTime, METRICS_URL, sleep, uniquePath } from "../helpers/varnish.ts";
 
 const scrape = async (): Promise<string> => {
   const response = await fetch(`${METRICS_URL}/metrics`);
@@ -39,15 +39,27 @@ describe("prometheus exporter", () => {
   });
 
   it("counts traffic flowing through the cache", async () => {
-    // The exporter shells out to varnishstat on every scrape, so the counters
-    // are current rather than cached between requests.
+    // Worker threads accumulate their statistics and only publish them once the
+    // lock is free, or after thread_stats_rate jobs (10 by default). The
+    // exported counter therefore lags the requests that caused it, so keep
+    // driving traffic until the published value catches up instead of assuming
+    // a couple of requests are enough to move it.
     const before = counter(await scrape(), "varnish_main_client_req");
-
     const path = uniquePath("metrics");
-    await fetchTime(path);
-    await fetchTime(path);
+    const deadline = Date.now() + 20_000;
 
-    const after = counter(await scrape(), "varnish_main_client_req");
+    let after = before;
+
+    while (Date.now() < deadline) {
+      await fetchTime(path);
+
+      after = counter(await scrape(), "varnish_main_client_req");
+      if (after > before) {
+        break;
+      }
+
+      await sleep(100);
+    }
 
     assert.ok(after > before, `expected the request counter to grow, got ${before} then ${after}`);
   });
