@@ -33,6 +33,18 @@ sub vcl_backend_response {
     set beresp.uncacheable = true;
     return (deliver);
   }
+
+  # Tag every cached object with its own URL, using the legacy header the xkey
+  # vmod also indexes. This is what lets a PURGE invalidate all of a URL's
+  # entries at once: the request body, Authorization and Accept are part of the
+  # cache key, so one URL can hold many objects that a single lookup cannot
+  # reach. Kept separate from the "xkey" header so the tags the backend sends
+  # are left untouched.
+  if (beresp.http.X-HashTwo) {
+    set beresp.http.X-HashTwo = beresp.http.X-HashTwo + " " + bereq.url;
+  } else {
+    set beresp.http.X-HashTwo = bereq.url;
+  }
 }
 
 # Handles incoming requests and removes incoming cookies
@@ -45,11 +57,18 @@ sub vcl_recv {
     if (!client.ip ~ purge) {
       return (synth(405, "Method Not Allowed"));
     }
+    # An explicit tag invalidates every entry carrying it.
     if (req.http.xkey) {
       set req.http.n-gone = xkey.purge(req.http.xkey);
       return (synth(200, "Invalidated " + req.http.n-gone + " objects"));
     } else {
-      return (purge);
+      # Otherwise invalidate every cached variant of this URL. Objects are
+      # tagged with their URL in vcl_backend_response, so purging that tag drops
+      # the GET entry together with every request body, Authorization and Accept
+      # variant. A plain `return (purge)` would only reach the single entry
+      # hashing identically to this request.
+      set req.http.n-gone = xkey.purge(req.url);
+      return (synth(200, "Invalidated " + req.http.n-gone + " objects"));
     }
   }
 
@@ -104,6 +123,10 @@ sub vcl_deliver {
   } else {
     set resp.http.X-Cache = "MISS";
   }
+
+  # Internal cache tag, of no use to clients. The cached object keeps it, so
+  # invalidation is unaffected.
+  unset resp.http.X-HashTwo;
 
   return (deliver);
 }
