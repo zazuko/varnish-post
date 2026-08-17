@@ -32,6 +32,14 @@ jobs:
         working-directory: test
         run: npm run typecheck
 
+      - name: Lint
+        working-directory: test
+        run: npm run lint
+
+      - name: Check formatting
+        working-directory: test
+        run: npm run format:check
+
       - name: Run tests
         working-directory: test
         run: npm test

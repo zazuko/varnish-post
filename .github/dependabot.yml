@@ -18,23 +18,8 @@ updates:
     directory: "/test"
     schedule:
       interval: "weekly"
-
-  # Maintain dependencies for npm (test backend application)
-  - package-ecosystem: "npm"
-    directory: "/test/app"
-    schedule:
-      interval: "weekly"
     groups:
       oxc:
         patterns:
           - "oxlint"
           - "oxfmt"
-          - "@oxlint/*"
-          - "@oxfmt/*"
-      typescript:
-        patterns:
-          - "typescript"
-      fastify:
-        patterns:
-          - "fastify"
-          - "@fastify/*"

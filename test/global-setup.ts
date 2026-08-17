@@ -3,6 +3,8 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
+import { startBackend, type Backend } from "./backend.ts";
+
 const execFileAsync = promisify(execFile);
 
 const cwd = dirname(fileURLToPath(import.meta.url));
@@ -14,10 +16,19 @@ const PROJECT = "varnish-post-test";
 // Image builds are chatty, so give the child process room for their output.
 const MAX_BUFFER = 32 * 1024 * 1024;
 
+let backend: Backend | undefined;
+
+/**
+ * Run a Compose command.
+ *
+ * BACKEND_PORT is always passed through: the compose file interpolates it for
+ * every command, not just `up`.
+ */
 const compose = (args: string[]) =>
   execFileAsync("docker", ["compose", "--project-name", PROJECT, ...args], {
     cwd,
     maxBuffer: MAX_BUFFER,
+    env: { ...process.env, BACKEND_PORT: String(backend?.port ?? 0) },
   });
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -81,10 +92,15 @@ const waitForHttp = async (
 };
 
 const teardown = async (): Promise<void> => {
-  await compose(["down", "--volumes"]);
+  await compose(["down", "--volumes"]).catch(() => {});
+  await backend?.close();
+  backend = undefined;
 };
 
 export async function globalSetup(): Promise<void> {
+  // Started first: Varnish resolves and connects to it as soon as it boots.
+  backend = await startBackend();
+
   try {
     await compose(["up", "--detach", "--build", "--wait"]);
   } catch (error) {
@@ -94,21 +110,18 @@ export async function globalSetup(): Promise<void> {
     const details = describeError(error);
 
     // A partially started stack still has containers to clean up.
-    await teardown().catch(() => {});
+    await teardown();
 
     throw new Error(`Failed to start the Docker stack:\n${details}`, { cause: error });
   }
 
   try {
-    const [backendUrl, varnishUrl] = await Promise.all([
-      serviceUrl("backend", 8080),
-      serviceUrl("varnish", 80),
-    ]);
+    const varnishUrl = await serviceUrl("varnish", 80);
 
-    await Promise.all([waitForHttp(backendUrl), waitForHttp(varnishUrl)]);
+    await Promise.all([waitForHttp(backend.url), waitForHttp(varnishUrl)]);
 
     // Test files run in child processes and inherit this environment.
-    process.env.BACKEND_URL = backendUrl;
+    process.env.BACKEND_URL = backend.url;
     process.env.VARNISH_URL = varnishUrl;
   } catch (error) {
     await teardown();
