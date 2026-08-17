@@ -15,7 +15,7 @@ const requiredEnv = (name) => {
 export const BACKEND_URL = requiredEnv("BACKEND_URL");
 export const VARNISH_URL = requiredEnv("VARNISH_URL");
 
-/** Matches CACHE_TTL in docker-compose.yaml. */
+/** Matches CACHE_TTL in compose.yaml. */
 export const CACHE_TTL_MS = 2000;
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
