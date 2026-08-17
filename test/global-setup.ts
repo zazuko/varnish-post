@@ -116,13 +116,22 @@ export async function globalSetup(): Promise<void> {
   }
 
   try {
-    const varnishUrl = await serviceUrl("varnish", 80);
+    const [varnishUrl, metricsUrl] = await Promise.all([
+      serviceUrl("varnish", 80),
+      serviceUrl("varnish", 9131),
+    ]);
 
-    await Promise.all([waitForHttp(backend.url), waitForHttp(varnishUrl)]);
+    // The entrypoint delays the exporter, so it is the slowest to answer.
+    await Promise.all([
+      waitForHttp(backend.url),
+      waitForHttp(varnishUrl),
+      waitForHttp(`${metricsUrl}/metrics`),
+    ]);
 
     // Test files run in child processes and inherit this environment.
     process.env.BACKEND_URL = backend.url;
     process.env.VARNISH_URL = varnishUrl;
+    process.env.METRICS_URL = metricsUrl;
   } catch (error) {
     await teardown();
     throw error;

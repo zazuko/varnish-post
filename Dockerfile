@@ -1,18 +1,4 @@
-# Build the prometheus_varnish_exporter binary
-FROM docker.io/library/golang:1.25 AS prometheus_varnish_exporter
-WORKDIR /app
-
-# Releases: https://github.com/jonnenauha/prometheus_varnish_exporter/releases
-ARG PROMETHEUS_VARNISH_EXPORTER_VERSION=1.6.1
-
-RUN git config --global advice.detachedHead false \
-  && git clone https://github.com/jonnenauha/prometheus_varnish_exporter.git . \
-  && git checkout "${PROMETHEUS_VARNISH_EXPORTER_VERSION}" \
-  && go mod download \
-  && go build -o prometheus_varnish_exporter
-
-# Build the final image
-FROM docker.io/library/ubuntu:24.04
+FROM docker.io/library/ubuntu:26.04
 
 # Configuration
 ENV BACKEND_HOST="localhost"
@@ -34,15 +20,12 @@ RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y \
   gettext \
+  prometheus-varnish-exporter \
   tini \
   varnish \
   varnish-modules \
-  && apt-get clean
-
-# Get the prometheus_varnish_exporter binary
-COPY --from=prometheus_varnish_exporter \
-  /app/prometheus_varnish_exporter \
-  /usr/local/bin/prometheus_varnish_exporter
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Deploy our custom configuration
 WORKDIR /etc/varnish

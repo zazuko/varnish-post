@@ -5,6 +5,8 @@ services:
     # already listening locally. Tests discover it via `docker compose port`.
     ports:
       - 80
+      # Prometheus exporter, covered by tests/metrics.test.ts
+      - 9131
     extra_hosts:
       # The backend is not a container: it runs in the test process, on the
       # host, and is reached through the Docker host gateway.
@@ -16,3 +18,4 @@ services:
       - BACKEND_PORT=${BACKEND_PORT:?run the stack through "npm test"}
       - CACHE_TTL=2s
       - PURGE_ACL=0.0.0.0/0
+      - ENABLE_PROMETHEUS_EXPORTER=true

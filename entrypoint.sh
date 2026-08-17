@@ -38,7 +38,7 @@ fi
 
 # Start prometheus_varnish_exporter if enabled
 if [ "${ENABLE_PROMETHEUS_EXPORTER}" = "true" ]; then
-  (sleep 2 && prometheus_varnish_exporter \
+  (sleep 2 && prometheus-varnish-exporter \
     -web.listen-address ":9131" \
     -web.telemetry-path "/metrics") &
 fi
