@@ -35,7 +35,10 @@ You can use following environment variables for configuration:
 
 ## Cache invalidation
 
-You can invalidate the cache entry by sending the same request with the `PURGE` method.
+You can invalidate the cache entries of a URL by sending a request to it with the `PURGE` method.
+
+The request body, the `Authorization` header and the `Accept` header are all part of the cache key, so a single URL can hold several cache entries.
+A `PURGE` invalidates all of them at once, whatever body it carries.
 
 If your backend is sending a `xkey` header, if you send a `PURGE` request with the same `xkey` header, it will invalidate all cache entries with the same tag.
 
