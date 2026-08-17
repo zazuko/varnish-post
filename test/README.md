@@ -61,6 +61,7 @@ same millisecond.
 | `tests/errors.test.ts`  | error responses are passed through and not cached   |
 | `tests/purge.test.ts`   | `PURGE` invalidation                                |
 | `tests/xkey.test.ts`    | `xkey` tag-based invalidation                       |
+| `tests/metrics.test.ts` | the Prometheus exporter                             |
 | `helpers/varnish.ts`    | request/assertion helpers shared by the tests       |
 | `backend.ts`            | the origin server Varnish caches                    |
 
