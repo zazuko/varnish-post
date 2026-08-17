@@ -28,7 +28,6 @@ updates:
       typescript:
         patterns:
           - "typescript"
-          - "ts-node"
       fastify:
         patterns:
           - "fastify"
